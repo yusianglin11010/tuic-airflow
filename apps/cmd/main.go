@@ -14,7 +14,7 @@ func main() {
 	dbConfig := config.NewDBConfig(logger)
 	database.Initialize(dbConfig)
 	defer database.End()
-	// defer database.Close()
+
 	rootCmd := &cobra.Command{Use: "./app-name"}
 	rootCmd.AddCommand(cmd.FetchProject)
 	rootCmd.Execute()
