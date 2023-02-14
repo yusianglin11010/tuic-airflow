@@ -1,10 +1,12 @@
 package postgres
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 
 	"github.com/yusianglin11010/tuic-airflow/internal/config"
 	"github.com/yusianglin11010/tuic-airflow/internal/database"
@@ -69,5 +71,40 @@ func TestGetMarkersByID(t *testing.T) {
 	res, err := pgRepo.GetMarkersByID(logger, nil, randomID)
 	assert.Nil(t, err)
 	assert.Equal(t, len(markers), len(res))
+
+}
+
+func TestDeleteMarker(t *testing.T) {
+	logger, _ := zap.NewDevelopment()
+	cfg := config.NewDBConfig(logger)
+	database.Initialize(cfg)
+	db := database.GetDB()
+	pgRepo := NewPGRepo(db)
+	randomID := uuid.New().String()
+	markers := []model.Marker{
+		{
+			ProjectID: randomID,
+			Name:      "test",
+			Lat:       "12.3",
+			Lng:       "45.6",
+		},
+		{
+			ProjectID: randomID,
+			Name:      "test",
+			Lat:       "12.3",
+			Lng:       "45.6",
+		},
+	}
+	for _, marker := range markers {
+		err := db.Create(&marker).Error
+		assert.Nil(t, err)
+	}
+	err := pgRepo.DeleteMarker(logger, nil)
+	assert.Nil(t, err)
+	fmt.Println("Alive here")
+
+	data := model.Marker{}
+	err = db.Where("project_id = ?", randomID).First(&data).Error
+	assert.Equal(t, err, gorm.ErrRecordNotFound)
 
 }

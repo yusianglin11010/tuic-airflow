@@ -32,3 +32,18 @@ func (d *DB) initialize(cfg *config.DBConfig) {
 func GetDB() *DB {
 	return &db
 }
+
+func End() {
+	db.close()
+}
+
+func (d *DB) close() {
+
+	sql, err := d.DB.DB()
+	if err != nil {
+		panic(err)
+	}
+	sql.Close()
+	d.DB = nil
+
+}

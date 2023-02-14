@@ -11,6 +11,8 @@ type DBRepo interface {
 	GetMarkersByID(logger *zap.Logger, tx *gorm.DB, id string) ([]model.Marker, error)
 
 	CreateMarker(logger *zap.Logger, tx *gorm.DB, markers []model.Marker) error
+
+	DeleteMarker(logger *zap.Logger, tx *gorm.DB) error
 }
 
 var _ DBRepo = (*pgRepo)(nil)
@@ -49,4 +51,19 @@ func (repo *pgRepo) CreateMarker(logger *zap.Logger, tx *gorm.DB, markers []mode
 		}
 	}
 	return nil
+}
+
+// XXX: some copy operation should be designed before delete records
+func (repo *pgRepo) DeleteMarker(logger *zap.Logger, tx *gorm.DB) error {
+	if tx == nil {
+		tx = database.GetDB().DB
+	}
+
+	if err := tx.Where("1 = 1").Delete(&model.Marker{}).Error; err != nil {
+		logger.Error("delete marker fail", zap.Error(err))
+		return err
+	}
+
+	return nil
+
 }

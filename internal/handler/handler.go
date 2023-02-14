@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -46,8 +45,6 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, "get data failed")
 		return
 	}
-
-	fmt.Println(res)
 
 	resp := getProjectResp{}
 	projects := []projectResp{}
